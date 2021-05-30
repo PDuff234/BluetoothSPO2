@@ -35,23 +35,33 @@ const Home: FC = () => {
     (state: RootState) => state.bluetooth.availableDevices,
   );
 
+  const heartRate = useSelector(
+    (state: RootState) => state.bluetooth.heartRate
+  )
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+      
         {devices.map(device => (
           <>
             <Text>{JSON.stringify(device)}</Text>
             <View height={20} />
           </>
         ))}
+        <Text>Your Heart Rate is: {heartRate}</Text>
         <Button
           title="Press Here To Scan"
           onPress={() => {
-            // dispatch(scanForPeripherals());
+            dispatch(scanForPeripherals());
+          }}
+        />
+                <Button
+          title="Connect And Get Heart Rate"
+          onPress={() => {
             dispatch(initiateConnection("0EC06222-BDA1-C0D2-AEB1-7D02A21C5E48"))
           }}
         />
-      </ScrollView>
+      
     </SafeAreaView>
   );
 };

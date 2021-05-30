@@ -31,16 +31,39 @@ function* watchForPeripherals() {
 }
 
 function* connectToPeripheral(action: {
-    type: typeof sagaActionConstants.INITIATE_CONNECTION,
-    payload: string
+  type: typeof sagaActionConstants.INITIATE_CONNECTION;
+  payload: string;
 }) {
+  const onHeartrateUpdate = () =>
+    eventChannel(emitter => {
+      bluetoothLeManager.startStreamingData(emitter);
+
+      return () => {
+        bluetoothLeManager.stopScanningForPeripherals();
+      };
+    });
+
   const peripheralId = action.payload;
   yield call(bluetoothLeManager.connectToPeripheral, peripheralId);
   yield put({
     type: sagaActionConstants.CONNECTION_SUCCESS,
     payload: peripheralId,
   });
-  bluetoothLeManager.startStreamingData()
+  yield call(bluetoothLeManager.stopScanningForPeripherals);
+
+  const channel: TakeableChannel<unknown> = yield call(onHeartrateUpdate);
+
+  try {
+    while (true) {
+      const response = yield take(channel);
+      yield put({
+        type: sagaActionConstants.UPDATE_HEART_RATE,
+        payload: response.payload,
+      });
+    }
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export function* bluetoothSaga() {

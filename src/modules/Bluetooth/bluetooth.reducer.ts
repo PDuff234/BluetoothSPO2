@@ -6,12 +6,14 @@ type BluetoothState = {
   availableDevices: Array<BluetoothPeripheral>;
   isConnectingToDevice: boolean;
   connectedDevice: string | null;
+  heartRate: number
 };
 
 const initialState: BluetoothState = {
   availableDevices: [],
   isConnectingToDevice: false,
   connectedDevice: null,
+  heartRate: -1
 };
 
 const bluetoothReducer = createSlice({
@@ -27,6 +29,9 @@ const bluetoothReducer = createSlice({
     connectPeripheral: (state, action) => {
       state.isConnectingToDevice = false;
       state.connectedDevice = action.payload;
+    },
+    updateHeartRate: (state, action) => {
+      state.heartRate = action.payload
     },
     bluetoothPeripheralsFound: (
       state: BluetoothState,
@@ -57,6 +62,7 @@ export const sagaActionConstants = {
   ON_DEVICE_DISCOVERED: bluetoothReducer.actions.bluetoothPeripheralsFound.type,
   INITIATE_CONNECTION: bluetoothReducer.actions.initiateConnection.type,
   CONNECTION_SUCCESS: bluetoothReducer.actions.connectPeripheral.type,
+  UPDATE_HEART_RATE: bluetoothReducer.actions.updateHeartRate.type
 };
 
 export default bluetoothReducer;
