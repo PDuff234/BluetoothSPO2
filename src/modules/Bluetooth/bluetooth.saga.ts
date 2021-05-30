@@ -40,6 +40,7 @@ function* connectToPeripheral(action: {
     type: sagaActionConstants.CONNECTION_SUCCESS,
     payload: peripheralId,
   });
+  bluetoothLeManager.startStreamingData()
 }
 
 export function* bluetoothSaga() {
