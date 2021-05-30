@@ -26,6 +26,10 @@ class BluetoothLeManager {
   stopScanningForPeripherals = () => {
     this.bleManager.stopDeviceScan();
   };
+
+  connectToPeripheral = async (identifier: string) => {
+    return await this.bleManager.connectToDevice(identifier)
+  }
 }
 
 const bluetoothLeManager = new BluetoothLeManager();

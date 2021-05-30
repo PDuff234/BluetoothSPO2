@@ -18,7 +18,7 @@ import {
   View,
 } from 'react-native';
 import {Provider, useDispatch, useSelector} from 'react-redux';
-import {scanForPeripherals} from './modules/Bluetooth/bluetooth.reducer';
+import {scanForPeripherals, initiateConnection} from './modules/Bluetooth/bluetooth.reducer';
 import {RootState, store} from './store/store';
 
 const App: FC = () => {
@@ -47,7 +47,8 @@ const Home: FC = () => {
         <Button
           title="Press Here To Scan"
           onPress={() => {
-            dispatch(scanForPeripherals());
+            // dispatch(scanForPeripherals());
+            dispatch(initiateConnection("0EC06222-BDA1-C0D2-AEB1-7D02A21C5E48"))
           }}
         />
       </ScrollView>

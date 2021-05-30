@@ -4,10 +4,14 @@ import {BluetoothPeripheral} from '../../models/BluetoothPeripheral';
 
 type BluetoothState = {
   availableDevices: Array<BluetoothPeripheral>;
+  isConnectingToDevice: boolean;
+  connectedDevice: string | null;
 };
 
 const initialState: BluetoothState = {
   availableDevices: [],
+  isConnectingToDevice: false,
+  connectedDevice: null,
 };
 
 const bluetoothReducer = createSlice({
@@ -17,6 +21,13 @@ const bluetoothReducer = createSlice({
     scanForPeripherals: state => {
       state = state;
     },
+    initiateConnection: (state, _) => {
+      state.isConnectingToDevice = true;
+    },
+    connectPeripheral: (state, action) => {
+      state.isConnectingToDevice = false;
+      state.connectedDevice = action.payload;
+    },
     bluetoothPeripheralsFound: (
       state: BluetoothState,
       action: PayloadAction<BluetoothPeripheral>,
@@ -25,19 +36,27 @@ const bluetoothReducer = createSlice({
       const isDuplicate = state.availableDevices.some(
         device => device.id === action.payload.id,
       );
-      if (!isDuplicate) {
+      const isCorsenseMonitor = action.payload?.name
+        ?.toLowerCase()
+        ?.includes('corsense');
+      if (!isDuplicate && isCorsenseMonitor) {
         state.availableDevices = state.availableDevices.concat(action.payload);
       }
     },
   },
 });
 
-export const {bluetoothPeripheralsFound, scanForPeripherals} =
-  bluetoothReducer.actions;
+export const {
+  bluetoothPeripheralsFound,
+  scanForPeripherals,
+  initiateConnection,
+} = bluetoothReducer.actions;
 
 export const sagaActionConstants = {
   SCAN_FOR_PERIPHERALS: bluetoothReducer.actions.scanForPeripherals.type,
   ON_DEVICE_DISCOVERED: bluetoothReducer.actions.bluetoothPeripheralsFound.type,
+  INITIATE_CONNECTION: bluetoothReducer.actions.initiateConnection.type,
+  CONNECTION_SUCCESS: bluetoothReducer.actions.connectPeripheral.type,
 };
 
 export default bluetoothReducer;

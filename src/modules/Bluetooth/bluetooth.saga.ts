@@ -30,9 +30,22 @@ function* watchForPeripherals() {
   }
 }
 
+function* connectToPeripheral(action: {
+    type: typeof sagaActionConstants.INITIATE_CONNECTION,
+    payload: string
+}) {
+  const peripheralId = action.payload;
+  yield call(bluetoothLeManager.connectToPeripheral, peripheralId);
+  yield put({
+    type: sagaActionConstants.CONNECTION_SUCCESS,
+    payload: peripheralId,
+  });
+}
+
 export function* bluetoothSaga() {
   yield takeEvery(
     sagaActionConstants.SCAN_FOR_PERIPHERALS,
     watchForPeripherals,
   );
+  yield takeEvery(sagaActionConstants.INITIATE_CONNECTION, connectToPeripheral);
 }
