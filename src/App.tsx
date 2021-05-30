@@ -8,16 +8,20 @@
  * @format
  */
 
-import React from 'react';
-import {Button, SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import { BleManager } from 'react-native-ble-plx';
-import {Provider, useDispatch} from 'react-redux';
-import {bluetoothPeripheralsFound} from './modules/Bluetooth/bluetooth.reducer';
-import {store} from './store/store';
+import React, {FC} from 'react';
+import {
+  Button,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {Provider, useDispatch, useSelector} from 'react-redux';
+import {scanForPeripherals} from './modules/Bluetooth/bluetooth.reducer';
+import {RootState, store} from './store/store';
 
-const manager = new BleManager()
-
-const App = () => {
+const App: FC = () => {
   return (
     <Provider store={store}>
       <Home />
@@ -25,26 +29,28 @@ const App = () => {
   );
 };
 
-const Home = () => {
+const Home: FC = () => {
   const dispatch = useDispatch();
-
-  const scanForPeripherals = () => {
-    
-    manager.startDeviceScan(null, null, (error, scannedDevice) => {
-        console.log(scannedDevice)
-    })
-  }
+  const devices = useSelector(
+    (state: RootState) => state.bluetooth.availableDevices,
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Hello world</Text>
-      <Button
-        title="Press Here"
-        onPress={() => {
-          dispatch(bluetoothPeripheralsFound(['AA:DD:CC:DD']));
-          scanForPeripherals()
-        }}
-      />
+      <ScrollView>
+        {devices.map(device => (
+          <>
+            <Text>{JSON.stringify(device)}</Text>
+            <View height={20} />
+          </>
+        ))}
+        <Button
+          title="Press Here To Scan"
+          onPress={() => {
+            dispatch(scanForPeripherals());
+          }}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
