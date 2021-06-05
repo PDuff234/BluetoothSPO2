@@ -8,19 +8,11 @@
  * @format
  */
 
-import React, {FC, useCallback, useState} from 'react';
-import {
-  FlatList,
-  ListRenderItemInfo,
-  Modal,
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {FC, useState} from 'react';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Provider, useDispatch, useSelector} from 'react-redux';
+import CTAButton from './components/CTAButton';
+import DeviceModal from './components/DeviceConnectionModal';
 import {BluetoothPeripheral} from './models/BluetoothPeripheral';
 import {
   initiateConnection,
@@ -29,79 +21,11 @@ import {
 } from './modules/Bluetooth/bluetooth.reducer';
 import {RootState, store} from './store/store';
 
-const DeviceModalListItem: FC<{
-  item: ListRenderItemInfo<BluetoothPeripheral>;
-  connectToPeripheral: (device: BluetoothPeripheral) => void;
-  closeModal: () => void;
-}> = props => {
-  const {item, connectToPeripheral, closeModal} = props;
-  const connectAndCloseModal = useCallback(() => {
-    connectToPeripheral(item.item);
-    closeModal();
-  }, [closeModal, connectToPeripheral, item.item]);
-  return (
-    <Pressable
-      style={modalStyle.modalCellOutline}
-      onPress={connectAndCloseModal}>
-      <Text>{item.item.name}</Text>
-    </Pressable>
-  );
-};
-
-const DeviceModal: FC<{
-  devices: BluetoothPeripheral[];
-  visible: boolean;
-  connectToPeripheral: (device: BluetoothPeripheral) => void;
-  closeModal: () => void;
-}> = props => {
-  const {devices, visible, connectToPeripheral, closeModal} = props;
-
-  const renderDeviceModalListItem = useCallback(
-    (item: ListRenderItemInfo<BluetoothPeripheral>) => {
-      return (
-        <DeviceModalListItem
-          item={item}
-          connectToPeripheral={connectToPeripheral}
-          closeModal={closeModal}
-        />
-      );
-    },
-    [closeModal, connectToPeripheral],
-  );
-
-  return (
-    <Modal
-      style={modalStyle.modalContainer}
-      animationType="slide"
-      transparent={false}
-      visible={visible}>
-      <SafeAreaView style={modalStyle.modalTitle}>
-        <Text style={modalStyle.modalTitleText}>
-          Tap on a device to connect
-        </Text>
-        <FlatList
-          contentContainerStyle={modalStyle.modalFlatlistContiner}
-          data={devices}
-          renderItem={renderDeviceModalListItem}
-        />
-      </SafeAreaView>
-    </Modal>
-  );
-};
-
 const App: FC = () => {
   return (
     <Provider store={store}>
       <Home />
     </Provider>
-  );
-};
-
-const CTAButton: FC<{title: string; onPress: () => void}> = props => {
-  return (
-    <TouchableOpacity style={styles.ctaButtonContiner} onPress={props.onPress}>
-      <Text style={styles.ctaButtonText}>{props.title}</Text>
-    </TouchableOpacity>
   );
 };
 
@@ -165,37 +89,10 @@ const Home: FC = () => {
   );
 };
 
-const modalStyle = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-  },
-  modalFlatlistContiner: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  modalCellOutline: {
-    borderWidth: 1,
-    borderColor: 'black',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 8,
-  },
-  modalTitle: {
-    flex: 1,
-  },
-  modalTitleText: {
-    marginTop: 40,
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginHorizontal: 20,
-    textAlign: 'center',
-  },
-});
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f2f2f2',
   },
   heartRateTitleWrapper: {
     flex: 1,
@@ -211,20 +108,6 @@ const styles = StyleSheet.create({
   heartRateText: {
     fontSize: 25,
     marginTop: 15,
-  },
-  ctaButtonContiner: {
-    height: 55,
-    marginHorizontal: 25,
-    backgroundColor: '#7735C2',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  ctaButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
 
