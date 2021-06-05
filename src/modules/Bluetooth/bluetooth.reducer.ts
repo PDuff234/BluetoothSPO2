@@ -1,19 +1,22 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Device} from 'react-native-ble-plx';
 import {BluetoothPeripheral} from '../../models/BluetoothPeripheral';
 
 type BluetoothState = {
   availableDevices: Array<BluetoothPeripheral>;
   isConnectingToDevice: boolean;
   connectedDevice: string | null;
-  heartRate: number
+  heartRate: number;
+  isRetrievingHeartRateUpdates: boolean;
+  isScanning: boolean;
 };
 
 const initialState: BluetoothState = {
   availableDevices: [],
   isConnectingToDevice: false,
   connectedDevice: null,
-  heartRate: -1
+  heartRate: 0,
+  isRetrievingHeartRateUpdates: false,
+  isScanning: false,
 };
 
 const bluetoothReducer = createSlice({
@@ -21,7 +24,7 @@ const bluetoothReducer = createSlice({
   initialState: initialState,
   reducers: {
     scanForPeripherals: state => {
-      state = state;
+      state.isScanning = true;
     },
     initiateConnection: (state, _) => {
       state.isConnectingToDevice = true;
@@ -31,7 +34,10 @@ const bluetoothReducer = createSlice({
       state.connectedDevice = action.payload;
     },
     updateHeartRate: (state, action) => {
-      state.heartRate = action.payload
+      state.heartRate = action.payload;
+    },
+    startHeartRateScan: state => {
+      state.isRetrievingHeartRateUpdates = true;
     },
     bluetoothPeripheralsFound: (
       state: BluetoothState,
@@ -55,6 +61,7 @@ export const {
   bluetoothPeripheralsFound,
   scanForPeripherals,
   initiateConnection,
+  startHeartRateScan,
 } = bluetoothReducer.actions;
 
 export const sagaActionConstants = {
@@ -62,7 +69,8 @@ export const sagaActionConstants = {
   ON_DEVICE_DISCOVERED: bluetoothReducer.actions.bluetoothPeripheralsFound.type,
   INITIATE_CONNECTION: bluetoothReducer.actions.initiateConnection.type,
   CONNECTION_SUCCESS: bluetoothReducer.actions.connectPeripheral.type,
-  UPDATE_HEART_RATE: bluetoothReducer.actions.updateHeartRate.type
+  UPDATE_HEART_RATE: bluetoothReducer.actions.updateHeartRate.type,
+  START_HEART_RATE_SCAN: bluetoothReducer.actions.startHeartRateScan.type,
 };
 
 export default bluetoothReducer;

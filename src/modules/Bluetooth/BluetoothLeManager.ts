@@ -1,11 +1,10 @@
+/* eslint-disable no-bitwise */
 import base64 from 'react-native-base64';
-
 import {
   BleError,
   BleManager,
   Characteristic,
   Device,
-  Service,
 } from 'react-native-ble-plx';
 
 const HEART_RATE_UUID = '0000180d-0000-1000-8000-00805f9b34fb';
@@ -52,16 +51,17 @@ class BluetoothLeManager {
       emitter({payload: error});
     }
 
-    const data = base64.decode(characteristic?.value);
+    const data = base64.decode(characteristic?.value ?? '');
 
     let heartRate: number = -1;
-    const firstBitValue: number = data[0] & 0x01;
+
+    const firstBitValue: number = (<any>data[0]) & 0x01;
 
     if (firstBitValue === 0) {
       heartRate = data[1].charCodeAt(0);
     } else {
       heartRate =
-        Number(data[1].charCodeAt(0) << 8) + Number(data[1].charCodeAt(2));
+        Number(data[1].charCodeAt(0) << 8) + Number(data[2].charCodeAt(2));
     }
 
     emitter({payload: heartRate});
@@ -71,24 +71,12 @@ class BluetoothLeManager {
     emitter: (arg0: {payload: number | BleError}) => void,
   ) => {
     await this.device?.discoverAllServicesAndCharacteristics();
-    const allServices = (await this.device?.services()) ?? [];
-
-    for (const service of allServices) {
-      if (service.uuid === HEART_RATE_UUID) {
-        const characteristics: Characteristic[] =
-          await service.characteristics();
-        for (const characteristic of characteristics) {
-          if (characteristic.uuid === HEART_RATE_CHARACTERISTIC) {
-            this.device?.monitorCharacteristicForService(
-              service.uuid,
-              characteristic.uuid,
-              (error, characteristic) =>
-                this.onHeartRateUpdate(error, characteristic, emitter),
-            );
-          }
-        }
-      }
-    }
+    this.device?.monitorCharacteristicForService(
+      HEART_RATE_UUID,
+      HEART_RATE_CHARACTERISTIC,
+      (error, characteristic) =>
+        this.onHeartRateUpdate(error, characteristic, emitter),
+    );
   };
 }
 
