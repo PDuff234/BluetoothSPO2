@@ -54,10 +54,10 @@ const Home: FC = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.heartRateTitleWrapper}>
         {isConnected ? (
-          <>
+          <div>
             <Text style={styles.heartRateTitleText}>Your Heart Rate Is:</Text>
             <Text style={styles.heartRateText}>{heartRate} bpm</Text>
-          </>
+          </div>
         ) : (
           <Text style={styles.heartRateTitleText}>
             Please Connect to a Heart Rate Monitor

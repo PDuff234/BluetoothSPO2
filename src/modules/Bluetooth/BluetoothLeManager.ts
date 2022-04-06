@@ -61,7 +61,7 @@ class BluetoothLeManager {
       heartRate = data[1].charCodeAt(0);
     } else {
       heartRate =
-        Number(data[1].charCodeAt(0) << 8) + Number(data[2].charCodeAt(2));
+        Number(data[1].charCodeAt(0) << 8) + Number(data[2].charCodeAt(2)) + Number(data[3].charCodeAt(3));
     }
 
     emitter({payload: heartRate});
